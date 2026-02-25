@@ -43,7 +43,7 @@
 -->
 
   <front>
-    <title abbrev="Abbreviated Title">Title [REPLACE]</title>
+    <title abbrev="Abbreviated Title">Service Segmentation Extensions for Computing-Aware Traffic Steering in Mobile User Plane Architecture</title>
     <!--  [REPLACE/DELETE] abbrev. The abbreviated title is required if the full title is longer than 39 characters -->
 
     <seriesInfo name="Internet-Draft" value="draft-dcn-dmm-cats-mup-service-segmentation-01"/>
@@ -102,18 +102,22 @@
     
     <section>
       <name>Introduction</name>
-      <t>Introductory text [REPLACE]</t>
-      
-      <section>
-        <name>Requirements Language</name>
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
-          "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
-          RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-          interpreted as described in BCP 14 <xref target="RFC2119"/>
-          <xref target="RFC8174"/> when, and only when, they appear in
-          all capitals, as shown here.</t>
-      </section>
-      <!-- [CHECK] The 'Requirements Language' section is optional -->
+      <t>The document <xref target="I-D.draft-dcn-dmm-cats-mup"/> describes how to integrate Computing-Aware Traffic Steering (CATS) capabilities into the Mobile User Plane (MUP) architecture. In that design, when multiple candidate service instances are deployed at different locations, the MUP Controller (MUP-C), as the core component of the architecture, selects the optimal service instance by considering computing and network information. The MUP-C receives user mobility session information from the control plane entity and converts such session information into IPv6 dataplane routing information. Instead of relying on traditional anchoring mechanisms or intermediate user plane forwarding nodes, the session is directly mapped into SRv6-based routing instructions in the underlay network. The Type 2 Session Transformed Route (T2ST) and Type 1 Session Transformed Route (T1ST) are used to convert session information into SRv6-based routing paths toward the selected service endpoint. As a result, traffic steering is realized at the IP routing level without requiring dedicated anchor or intermediate nodes in the mobile user plane. </t>
+
+      <t>However, emerging 6G applications introduce a new deployment paradigm, where a service is decomposed into multiple subtasks that are distributed across different edge locations. These subtasks can be organized as a sequential service pipeline, where traffic must traverse service instances in a predefined sequence, or as a parallel service pipeline, where traffic is distributed to multiple service instances and later merged. Such service segmentation scenarios are discussed in <xref target="I-D.draft-dcn-cats-req-service-segmentation"/>.</t>
+
+      <t>The existing T1ST and T2ST mechanisms are defined for mapping a session to a selected service instance, where traffic is steered toward a specific execution endpoint. While this model is suitable when a session is directed to one optimal service instance, service segmentation introduces scenarios in which a sequential service pipeline spans multiple service instances as part of a single service execution. In such cases, the session-to-route transformation must not only select appropriate service instances, but also support ordered traversal across them and preserve overall service continuity, particularly when the pipeline includes stateful subtasks.</t>
+
+      <t>This document is proposed to discuss possible extension considerations to the CATS-MUP architecture in order to support service segmentation scenarios. The objective is to extend the existing session transformation and routing mechanisms to accommodate sequential and parallel service pipelines, and to provide routing-level considerations for preserving service continuity when stateful subtasks are involved.</t>
+    </section>
+
+    <section title="Terminology used in this draft">
+
+    <t>
+    This document uses the terminology defined in 
+    <xref target="I-D.draft-dcn-dmm-cats-mup"/> and 
+    <xref target="I-D.draft-dcn-cats-req-service-segmentation"/>.
+    </t>
 
     </section>
     
@@ -191,63 +195,33 @@ source code goes here [REPLACE]
   <back>
     <references>
       <name>References</name>
-      <references>
-        <name>Normative References</name>
-        
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
-        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
-        <!-- The recommended and simplest way to include a well known reference -->
-        
-      </references>
  
       <references>
         <name>Informative References</name>
        
-        <reference anchor="exampleRefMin">
-        <!-- [REPLACE/DELETE] Example minimum reference -->
+        <reference anchor="I-D.draft-dcn-dmm-cats-mup" target ="https://datatracker.ietf.org/doc/draft-dcn-dmm-cats-mup/">
           <front>
-            <title>Title [REPLACE]</title>
-            <author initials="Initials [REPLACE]" surname="Surname [REPLACE]">
+            <title>Computing Aware Traffic Steering Consideration for Mobile User Plane Architecture</title>
+            <author initials="N., el at" surname="Tran">
               <organization/>
             </author>
-            <date year="2006"/>
-            <!-- [CHECK] -->
+            <date year="2026"/>
           </front>
         </reference>
 
-        <reference anchor="exampleRefOrg" target="http://www.example.com/">
+        <reference anchor="I-D.draft-dcn-cats-req-service-segmentation" target="https://datatracker.ietf.org/doc/draft-dcn-cats-req-service-segmentation/">
         <!-- [REPLACE/DELETE] Example reference written by an organization not a person -->
           <front>
-            <title>Title [REPLACE]</title>
-            <author>
-              <organization>Organization [REPLACE]</organization>
+            <title>Additional CATS requirements consideration for Service Segmentation-related use cases</title>
+            <author initials="N., el at" surname="Tran">
+              <organization/>
             </author>
-            <date year="1984"/>
-            <!-- [CHECK] -->
+            <date year="2026"/>
           </front>
         </reference>       
        
       </references>
     </references>
-    
-    <section>
-      <name>Appendix 1 [REPLACE/DELETE]</name>
-      <t>This becomes an Appendix [REPLACE]</t>
-    </section>
-
-    <section anchor="Acknowledgements" numbered="false">
-      <!-- [REPLACE/DELETE] an Acknowledgements section is optional -->
-      <name>Acknowledgements</name>
-      <t>This template uses extracts from templates written by Pekka Savola, Elwyn Davies and 
-        Henrik Levkowetz. [REPLACE]</t>
-    </section>
-    
-    <section anchor="Contributors" numbered="false">
-      <!-- [REPLACE/DELETE] a Contributors section is optional -->
-      <name>Contributors</name>
-      <t>Thanks to all of the contributors. [REPLACE]</t>
-      <!-- [CHECK] it is optional to add a <contact> record for some or all contributors -->
-    </section>
     
  </back>
 </rfc>
