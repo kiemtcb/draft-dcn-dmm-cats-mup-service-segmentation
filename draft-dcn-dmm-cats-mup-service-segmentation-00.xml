@@ -26,7 +26,7 @@
 <rfc
   xmlns:xi="http://www.w3.org/2001/XInclude"
   category="info"
-  docName="draft-dcn-dmm-cats-mup-service-segmentation-01"
+  docName="draft-dcn-dmm-cats-mup-service-segmentation-00"
   ipr="trust200902"
   obsoletes=""
   updates=""
@@ -46,7 +46,7 @@
     <title abbrev="Abbreviated Title">Service Segmentation Extensions for Computing-Aware Traffic Steering in Mobile User Plane Architecture</title>
     <!--  [REPLACE/DELETE] abbrev. The abbreviated title is required if the full title is longer than 39 characters -->
 
-    <seriesInfo name="Internet-Draft" value="draft-dcn-dmm-cats-mup-service-segmentation-01"/>
+    <seriesInfo name="Internet-Draft" value="draft-dcn-dmm-cats-mup-service-segmentation-00"/>
    
     <author fullname="Kiem Nguyen Trung" initials="K." surname="Nguyen-Trung">
       <organization> Soongsil University </organization>
@@ -122,66 +122,51 @@
     </section>
     
     <section>
-      <name>Body [REPLACE]</name>
-      <t>Body text [REPLACE]</t>
-      
-      <ol>
-        <li>Ordered list item [REPLACE/DELETE]</li>
-      </ol>
-      
-      <ul>
-        <li>Bulleted list item [REPLACE/DELETE]</li>
-      </ul>
-      
-      <dl newline="true">
-        <!-- Omit newline="true" if you want each definition to start on the same line as the corresponding term -->
-        <dt>First term: [REPLACE/DELETE]</dt>
-        <dd>Definition of the first term [REPLACE/DELETE]</dd>
-        <dt>Second term: [REPLACE/DELETE]</dt>
-        <dd>Definition of the second term [REPLACE/DELETE]</dd>
-      </dl>
-      
-      <table>
-        <thead>
-        <!-- [REPLACE/DELETE] a table header is optional -->
-          <tr><th>Column 1 [REPLACE]</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Cell [REPLACE]</td></tr>
-        </tbody>
-      </table>
-
+      <name>Proposed Architecture</name>
       <figure>
-        <name>Source [REPLACE]</name>
-        <sourcecode name="suggested filename [REPLACE/DELETE]" type="language [REPLACE/DELETE]" markers="true">
-          <![CDATA[
-source code goes here [REPLACE]
-          ]]>
-        </sourcecode>
-        <!-- [CHECK] markers="true" means that the rendered file will have <CODE BEGINS> and <CODE ENDS> added -->
+        <name>Service Segmentation Extensions for CATS-MUP Architecture</name>
+        <artwork><![CDATA[
+                             +----------------+
+                             |    Mobility    |
+                             |   Management   |
+                             |     System     |
+                             +----------------+
+                                      |
+                             Session Information
+                                      |
+                     STR    +--------v-------+  
+                     +------|   CATS-MUP-C   |
+                  +--|------|    +------+    |----------+
+                  |  |      |    | C-PS |    |          |
+                  |  |      +----------------+          |    +-----------------+
+      UE-         |  v                                  |    |      C-SMA      |
+         \+---+   +------+          DSD          +------+    |-----------------|
+      UE--|RAN|---|  PE  |<----------------------|  PE  |----|  Service Site A |
+          +---+   +------+<-----------\          +------+    |    Subtask 1    |
+      UE-/        |Buffer|             \         |Buffer|    |    Subtask 3    |
+                  +------+              \        +------+    +-----------------+
+                  |                      \              |
+                  |     MUP network       \      +------+    +-----------------+
+                  |      +-------+         \-----|  PE  |----|      C-SMA      |
+                  |      | C-NMA |               +------+    |-----------------|
+                  |      +-------+               |Buffer|    |  Service Site B |
+                  +------------------------------+------+    |    Subtask 1    |
+                                                             |    Subtask 2    |
+                                                             +-----------------+
+      ]]>
+        </artwork>
       </figure>
 
-      <figure>
-        <name>Diagram [REPLACE]</name>
-        <artset>
-        <!-- This <artset> includes two <artwork> elements, each of a different type -->
-          <artwork type="svg" src="https://www.rfc-editor.org/materials/format/svg/stream.svg" />
-          <!-- [REPLACE] src points to either a local file or a URI. -->
-          <artwork type="ascii-art" name="stream.txt">
-            <!-- [REPLACE/DELETE] name recommends a filename to use if the diagram is extracted -->  
-            <![CDATA[
- ascii-art diagram goes here [REPLACE]
-            ]]>
-          </artwork>
-        </artset>
-      </figure>
+      <t> Figure 1 illustrates the high-level architecture for supporting service segmentation in the CATS-MUP environment, where an application is decomposed into multiple subtasks deployed across different edge sites. Depending on deployment and execution logic, these subtasks may form sequential chains or parallel branches, requiring traffic steering to evolve from single-instance selection toward pipeline-aware steering across distributed subtasks. </t>
+
+      <t> For sequential pipelines, existing Session Transform Routes, including T1ST and T2ST, require the C-PS to configure traffic steering independently for each MUP-PE along the execution chain. As a result, the completion time of the CATS-MUP-C operation increases proportionally with the number of subtasks composing the pipeline. The situation becomes more complex when the active pipeline must be updated or replaced due to mobility events or changing resource conditions, since multiple steering configurations must be recomputed and consistently applied across all participating nodes. To address this limitation, this document proposes a new Session Transform Route referred to as the <em>MUP Sequence Session Transform</em>, enabling pipeline-level traffic steering for sequential service execution. The detailed design is presented in Section 3.1. </t>
+
+      <t> For parallel pipelines, existing T1ST and T2ST mechanisms remain applicable because traffic distribution and result aggregation can be handled by split and merge functions. User requests may be distributed across parallel subtasks, and intermediate results are combined before delivering the final outcome to the UE. However, each parallel branch may itself consist of a sequential chain of subtasks, in which case the same scalability and steering reconfiguration issues as observed in sequential pipelines arise. Therefore, the proposed <em>MUP Sequence Session Transform</em> can also be applied within such branches to enable pipeline-level traffic steering </t>
+
+      <t> Service segmentation may involve stateful subtasks, making subtask migration necessary when an existing pipeline no longer satisfies QoS requirements. Maintaining service continuity during pipeline transitions requires preventing packet loss while new subtask instances are activated and traffic steering is updated. One approach to enabling such transitions is the use of SRv6-based buffering, which temporarily stores packets during path updates and releases them once the new execution pipeline becomes operational. </t>
+      
+      <t> Furthermore, a single subtask type may have multiple instances deployed across different MEC sites. Selecting an optimal pipeline based solely on per-instance evaluation may introduce significant decision overhead as deployment scale increases. To address this challenge, Service Pipeline Metrics are introduced to evaluate pipelines as unified entities rather than independent instances, enabling efficient pipeline selection as described in <xref target="I-D.draft-dcn-cats-req-service-segmentation"/>. </t>
     </section>   
-    
-    <section anchor="IANA">
-    <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
-      <name>IANA Considerations</name>
-      <t>This memo includes no request to IANA. [CHECK]</t>
-    </section>
     
     <section anchor="Security">
       <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
