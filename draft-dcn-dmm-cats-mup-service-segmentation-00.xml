@@ -177,34 +177,33 @@
       <figure anchor="fig-mup-sst">
         <name>MUP Sequence Session Transform Example</name>
         <artwork><![CDATA[
-                                    +-----------+                         +-----------+                         +-----------+
-                                    | Subtask 1 |                         | Subtask 2 |                         | Subtask 3 |
-                                    +-----------+                         +-----------+                         +-----------+
-                                          |                                     |                                     |
-                                    +-----------+                         +-----------+                         +-----------+
-                                    | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
-                                    +-----------+                         +-----------+                         +-----------+
-                                          ^ |                                   ^ |                                   ^ |
-                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                           | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
-                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                           | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
-                           +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
-      +--+  +------+                   +--------+                            +--------+                            +--------+
-      |UE|->|RAN PE|------------------>|MUP PE 1|--------------------------->|MUP PE 2|--------------------------->|MUP PE 3|
-      +--+  +------+                   +--------+                            +--------+                            +--------+
-                    +-----------------+               +-----------------+                   +-----------------+
-                    |SRv6 Segment List|               |SRv6 Segment List|                   |SRv6 Segment List|
-                    | [0]: MUP PE 3   |               | [0]: MUP PE 3   |                   | [0]: MUP PE 3   |
-                    | [1]: MUP PE 2   |               | [1]: MUP PE 2   |                   | [1]: MUP PE 2   |
-                    | [2]: MUP PE 1   |               | [2]: MUP PE 1   |                   | [2]: MUP PE 1   |
-                    |      SL: 3      |               |      SL: 2      |                   |      SL: 1      |
-                    +-----------------+               +-----------------+                   +-----------------+
-                    |       NSH       |               |       NSH       |                   |       NSH       |
-                    | spi: X, si: 255 |               | spi: X, si: 254 |                   | spi: X, si: 253 |
-                    +-----------------+               +-----------------+                   +-----------------+
-                    |   Inner Packet  |               |   Inner Packet  |                   |   Inner Packet  |
-                    +-----------------+               +-----------------+                   +-----------------+
+                              +-----------+                +-----------+           
+                              | Subtask 1 |                | Subtask 2 |           
+                              +-----------+                +-----------+           
+                                    |                            |                 
+                              +-----------+                +-----------+           
+                              | SFC Proxy |                | SFC Proxy |           
+                              +-----------+                +-----------+           
+                                    ^                            ^               
+                       +----------+ | +----------+  +----------+ | +----------+
+                       |NSH(X,255)| | |Inner Pkt |  |NSH(X,254)| | |Inner Pkt |
+                       +----------+ | +----------+  +----------+ | +----------+
+                       |Inner Pkt | | |NSH(X,254)|  |Inner Pkt | | |NSH(X,253)|
+                       +----------+ v +----------+  +----------+ v +----------+
+      +--+  +------+           +--------+                   +--------+           
+      |UE|->|RAN PE|---------->|MUP PE 1|------------------>|MUP PE 2|
+      +--+  +------+           +--------+                   +--------+
+                  +-------------+            +-------------+                                                
+                  |     SRH     |            |     SRH     |                                                
+                  |[0]: MUP PE 2|            |[0]: MUP PE 2|                                                
+                  |[1]: MUP PE 1|            |[1]: MUP PE 1|                                                                                              
+                  |    SL: 2    |            |    SL: 1    |                                                
+                  +-------------+            +-------------+                                                      
+                  |  NSH(X,255) |            |  NSH(X,254) |                                                        
+                  +-------------+            +-------------+                                                        
+                  |  Inner Pkt  |            |  Inner Pkt  |                                                        
+                  +-------------+            +-------------+                                                        
+                             
         ]]></artwork>
       </figure>
       <t> The execution order of a service pipeline is encoded directly into packet forwarding state. Specifically, the SRv6 segment list carried in the SRH defines the traversal sequence across MUP-PE nodes, while service processing context is maintained within the packet using SRv6 Service Function Chaining (SFC) mechanisms, as specified in <xref target="RFC9491"/>. As illustrated in Figure 2, packets advance along the pipeline as each MUP-PE processes its local segment and updates the associated service context. </t>
