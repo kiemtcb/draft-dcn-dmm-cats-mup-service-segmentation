@@ -235,6 +235,11 @@
 
       <t> For example, consider a sequential service pipeline in which the final subtask maintains application state. When this stateful subtask is migrated due to mobility events or computing resource degradation, packets processed by upstream subtasks may reach the stateful subtask before migration is completed. As a result, these packets may be dropped or fail to be processed correctly, leading to wasted computing resources and unnecessary consumption of network bandwidth. </t>
 
+        <!-- Ngày mai viết thêm 2 behavior của SRv6-based Buffer (cite paper) => để mà traffic đến cần đến thì đã bị buffer => và được flush khi được yêu cầu => Buffer có thể là 1 VNF -->
+        <!-- Cái này chỉ được thực hiện với PDU modification  -->
+        <!-- Do chuỗi có có nhiều stateful subtask, việc migration lần lượt từng cái để đảm bảo service continuity là không phù hợp => cần parallel migration tất cả stateful subtasks  cùng một lúc-->
+        <!-- Chính vì vậy, tại mỗi MUP-PE của mỗi subtask, sau khi subtask xử lý do thay vì gắn lại SRH cũ thì được thay thế SRH mới với điểm đến là restored subtask và trước khi đến đó là buffer SID để mà traffic được giữ lại khi đang migration -->
+        <!-- Cơ chế chính là: sau khi tìm được pipeline mới, cài đặt routing để buffer => migration => đồng thời xả buffer và cập nhật lại bảng routing MUP PE để tránh đi qua buffer nữa  -->
     </section>   
     
   </middle>
