@@ -161,11 +161,56 @@
 
       <t> For sequential pipelines, existing Session Transform Routes, including T1ST and T2ST, require the C-PS to configure traffic steering independently for each MUP-PE along the execution chain. As a result, the completion time of the CATS-MUP-C operation increases proportionally with the number of subtasks composing the pipeline. The situation becomes more complex when the active pipeline must be updated or replaced due to mobility events or changing resource conditions, since multiple steering configurations must be recomputed and consistently applied across all participating nodes. To address this limitation, this document proposes a new Session Transform Route referred to as the <em>MUP Sequence Session Transform</em>, enabling pipeline-level traffic steering for sequential service execution. The detailed design is presented in Section 3.1. </t>
 
-      <t> For parallel pipelines, existing T1ST and T2ST mechanisms remain applicable because traffic distribution and result aggregation can be handled by split and merge functions. User requests may be distributed across parallel subtasks, and intermediate results are combined before delivering the final outcome to the UE. However, each parallel branch may itself consist of a sequential chain of subtasks, in which case the same scalability and steering reconfiguration issues as observed in sequential pipelines arise. Therefore, the proposed <em>MUP Sequence Session Transform</em> can also be applied within such branches to enable pipeline-level traffic steering </t>
+      <t> For parallel pipelines, existing T1ST and T2ST mechanisms remain applicable because traffic distribution and result aggregation can be handled by split and merge functions. User requests may be distributed across parallel subtasks, and intermediate results are combined before delivering the final outcome to the UE. However, each parallel branch may itself consist of a sequential chain of subtasks, in which case the same scalability and steering reconfiguration issues as observed in sequential pipelines arise. Therefore, the proposed <em>MUP Sequence Session Transform</em> can also be applied within such branches to enable pipeline-level traffic steering. </t>
 
       <t> Service segmentation may involve stateful subtasks, making subtask migration necessary when an existing pipeline no longer satisfies QoS requirements. Maintaining service continuity during pipeline transitions requires preventing packet loss while new subtask instances are activated and traffic steering is updated. One approach to enabling such transitions is the use of SRv6-based buffering, which temporarily stores packets during path updates and releases them once the new execution pipeline becomes operational. </t>
       
       <t> Furthermore, a single subtask type may have multiple instances deployed across different MEC sites. Selecting an optimal pipeline based solely on per-instance evaluation may introduce significant decision overhead as deployment scale increases. To address this challenge, Service Pipeline Metrics are introduced to evaluate pipelines as unified entities rather than independent instances, enabling efficient pipeline selection as described in <xref target="I-D.draft-dcn-cats-req-service-segmentation"/>. </t>
+    </section>
+
+    <section anchor="mup-sequence-session-transform">
+      <name>MUP Sequence Session Transform</name>
+
+      <figure anchor="fig-mup-sst">
+        <name>MUP Sequence Session Transform Example</name>
+        <artwork><![CDATA[
+                                      +-----------+                         +-----------+                         +-----------+
+                                      | Subtask 1 |                         | Subtask 2 |                         | Subtask 3 |
+                                      +-----------+                         +-----------+                         +-----------+
+                                            |                                     |                                     |      
+                                      +-----------+                         +-----------+                         +-----------+
+                                      | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
+                                      +-----------+                         +-----------+                         +-----------+
+                                           ^ |                                   ^ |                                   ^ |     
+                            +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                            | NSH(X,255) | | | |Inner Packet|     | NSH(X,254) | | | |Inner Packet|     | NSH(X,253) | | | |Inner Packet|
+                            +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                            |Inner Packet| | | | NSH(X,254) |     |Inner Packet| | | | NSH(X,253) |     |Inner Packet| | | | NSH(X,252) |
+                            +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
++---------+  +------+                   +--------+                            +--------+                            +--------+           
+|UE Packet|->|RAN PE|------------------>|MUP PE 1|--------------------------->|MUP PE 2|--------------------------->|MUP PE 3|
++---------+  +------+                   +--------+                            +--------+                            +--------+           
+                     +-----------------+               +-----------------+                   +-----------------+
+                     |SRv6 Segment List|               |SRv6 Segment List|                   |SRv6 Segment List|
+                     | [0]: MUP PE 3   |               | [0]: MUP PE 3   |                   | [0]: MUP PE 3   |
+                     | [1]: MUP PE 2   |               | [1]: MUP PE 2   |                   | [1]: MUP PE 2   |
+                     | [2]: MUP PE 1   |               | [2]: MUP PE 1   |                   | [2]: MUP PE 1   |
+                     |      SL: 3      |               |      SL: 2      |                   |      SL: 1      |
+                     +-----------------+               +-----------------+                   +-----------------+
+                     |       NSH       |               |       NSH       |                   |       NSH       |
+                     | spi: X, si: 255 |               | spi: X, si: 254 |                   | spi: X, si: 253 |
+                     +-----------------+               +-----------------+                   +-----------------+
+                     |   Inner Packet  |               |   Inner Packet  |                   |   Inner Packet  |
+                     +-----------------+               +-----------------+                   +-----------------+
+               ]]></artwork>
+      </figure>
+
+      <t>
+      This section specifies the MUP Sequence Session Transform mechanism,
+      which enables ordered traversal across multiple service sites for a
+      sequential service pipeline by encoding the pipeline as SRv6 segment
+      list and maintaining per-stage service context using NSH fields.
+      </t>
     </section>   
     
     <section anchor="Security">
