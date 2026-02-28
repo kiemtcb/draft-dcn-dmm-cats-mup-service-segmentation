@@ -1217,11 +1217,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Abbreviated Title</td>
-<td class="right">February 2026</td>
+<td class="right">March 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Nguyen-Trung, et al.</td>
-<td class="center">Expires 1 September 2026</td>
+<td class="center">Expires 2 September 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1234,12 +1234,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-dcn-dmm-cats-mup-service-segmentation-00</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-02-28" class="published">28 February 2026</time>
+<time datetime="2026-03-01" class="published">1 March 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-09-01">1 September 2026</time></dd>
+<dd class="expires"><time datetime="2026-09-02">2 September 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1281,7 +1281,7 @@ li > p:last-of-type:only-child {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1399,7 +1399,7 @@ li > p:last-of-type:only-child {
 <a href="#name-service-segmentation-extens" class="selfRef">Service Segmentation Extensions for CATS-MUP Architecture</a>
         </figcaption></figure>
 <p id="section-3-2"> Figure 1 illustrates the high-level architecture for supporting service segmentation in the CATS-MUP environment, where an application is decomposed into multiple subtasks deployed across different edge sites. Depending on deployment and execution logic, these subtasks may form sequential chains or parallel branches, requiring traffic steering to evolve from single-instance selection toward pipeline-aware steering across distributed subtasks.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3"> For sequential pipelines, existing Session Transform Routes, including T1ST and T2ST, require the C-PS to configure traffic steering independently for each MUP-PE along the execution chain. As a result, the completion time of the CATS-MUP-C operation increases proportionally with the number of subtasks composing the pipeline. The situation becomes more complex when the active pipeline must be updated or replaced due to mobility events or changing resource conditions, since multiple steering configurations must be recomputed and consistently applied across all participating nodes. To address this limitation, this document proposes a new Session Transform Route referred to as the <em>MUP Sequence Session Transform</em>, enabling pipeline-level traffic steering for sequential service execution. The detailed design is presented in Section 3.1.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-3"> For sequential pipelines, existing Session Transform Routes, including T1ST and T2ST, require the C-PS to configure traffic steering independently for each MUP-PE along the execution chain. As a result, the completion time of the CATS-MUP-C operation increases proportionally with the number of subtasks composing the pipeline. The situation becomes more complex when the active pipeline must be updated or replaced due to mobility events or changing resource conditions, since multiple steering configurations must be recomputed and consistently applied across all participating nodes. To address this limitation, this document proposes a new Session Transform Route referred to as the <em>MUP Sequence Session Transform</em>, enabling pipeline-level traffic steering for sequential service execution. The detailed design is presented in <a href="#mup-sequence-session-transform" class="auto internal xref">Section 4</a>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4"> For parallel pipelines, existing T1ST and T2ST mechanisms remain applicable because traffic distribution and result aggregation can be handled by split and merge functions. User requests may be distributed across parallel subtasks, and intermediate results are combined before delivering the final outcome to the UE. However, each parallel branch may itself consist of a sequential chain of subtasks, in which case the same scalability and steering reconfiguration issues as observed in sequential pipelines arise. Therefore, the proposed <em>MUP Sequence Session Transform</em> can also be applied within such branches to enable pipeline-level traffic steering.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <p id="section-3-5"> Service segmentation may involve stateful subtasks, making subtask migration necessary when an existing pipeline no longer satisfies QoS requirements. Maintaining service continuity during pipeline transitions requires preventing packet loss while new subtask instances are activated and traffic steering is updated. One approach to enabling such transitions is the use of SRv6-based buffering, which temporarily stores packets during path updates and releases them once the new execution pipeline becomes operational.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <p id="section-3-6"> Furthermore, a single subtask type may have multiple instances deployed across different MEC sites. Selecting an optimal pipeline based solely on per-instance evaluation may introduce significant decision overhead as deployment scale increases. To address this challenge, Service Pipeline Metrics are introduced to evaluate pipelines as unified entities rather than independent instances, enabling efficient pipeline selection as described in <span>[<a href="#I-D.draft-dcn-cats-req-service-segmentation" class="cite xref">I-D.draft-dcn-cats-req-service-segmentation</a>]</span>.<a href="#section-3-6" class="pilcrow">¶</a></p>
@@ -1409,49 +1409,70 @@ li > p:last-of-type:only-child {
       <h2 id="name-mup-sequence-session-transf">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-mup-sequence-session-transf" class="section-name selfRef">MUP Sequence Session Transform</a>
       </h2>
+<p id="section-4-1"> The MUP Sequence Session Transform defines how the Mobile User Plane steers packets across an ordered set of service stages using a single session transformation operation. Under this mechanism, the execution sequence of a service pipeline is encoded directly into packet forwarding behavior at MUP-PE nodes.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <span id="name-mup-sequence-session-transfo"></span><div id="fig-mup-sst">
 <figure id="figure-2">
-        <div class="alignLeft art-text artwork" id="section-4-1.1">
+        <div class="alignLeft art-text artwork" id="section-4-2.1">
 <pre>
-                                      +-----------+                         +-----------+                         +-----------+
-                                      | Subtask 1 |                         | Subtask 2 |                         | Subtask 3 |
-                                      +-----------+                         +-----------+                         +-----------+
-                                            |                                     |                                     |
-                                      +-----------+                         +-----------+                         +-----------+
-                                      | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
-                                      +-----------+                         +-----------+                         +-----------+
-                                           ^ |                                   ^ |                                   ^ |
-                            +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                            | NSH(X,255) | | | |Inner Packet|     | NSH(X,254) | | | |Inner Packet|     | NSH(X,253) | | | |Inner Packet|
-                            +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                            |Inner Packet| | | | NSH(X,254) |     |Inner Packet| | | | NSH(X,253) |     |Inner Packet| | | | NSH(X,252) |
-                            +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
-+---------+  +------+                   +--------+                            +--------+                            +--------+
-|UE Packet|-&gt;|RAN PE|------------------&gt;|MUP PE 1|---------------------------&gt;|MUP PE 2|---------------------------&gt;|MUP PE 3|
-+---------+  +------+                   +--------+                            +--------+                            +--------+
-                     +-----------------+               +-----------------+                   +-----------------+
-                     |SRv6 Segment List|               |SRv6 Segment List|                   |SRv6 Segment List|
-                     | [0]: MUP PE 3   |               | [0]: MUP PE 3   |                   | [0]: MUP PE 3   |
-                     | [1]: MUP PE 2   |               | [1]: MUP PE 2   |                   | [1]: MUP PE 2   |
-                     | [2]: MUP PE 1   |               | [2]: MUP PE 1   |                   | [2]: MUP PE 1   |
-                     |      SL: 3      |               |      SL: 2      |                   |      SL: 1      |
-                     +-----------------+               +-----------------+                   +-----------------+
-                     |       NSH       |               |       NSH       |                   |       NSH       |
-                     | spi: X, si: 255 |               | spi: X, si: 254 |                   | spi: X, si: 253 |
-                     +-----------------+               +-----------------+                   +-----------------+
-                     |   Inner Packet  |               |   Inner Packet  |                   |   Inner Packet  |
-                     +-----------------+               +-----------------+                   +-----------------+
+                                    +-----------+                         +-----------+                         +-----------+
+                                    | Subtask 1 |                         | Subtask 2 |                         | Subtask 3 |
+                                    +-----------+                         +-----------+                         +-----------+
+                                          |                                     |                                     |
+                                    +-----------+                         +-----------+                         +-----------+
+                                    | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
+                                    +-----------+                         +-----------+                         +-----------+
+                                          ^ |                                   ^ |                                   ^ |
+                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                          | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
+                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                          | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
+                          +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
+      +--+  +------+                   +--------+                            +--------+                            +--------+
+      |UE|-&gt;|RAN PE|------------------&gt;|MUP PE 1|---------------------------&gt;|MUP PE 2|---------------------------&gt;|MUP PE 3|
+      +--+  +------+                   +--------+                            +--------+                            +--------+
+                    +-----------------+               +-----------------+                   +-----------------+
+                    |SRv6 Segment List|               |SRv6 Segment List|                   |SRv6 Segment List|
+                    | [0]: MUP PE 3   |               | [0]: MUP PE 3   |                   | [0]: MUP PE 3   |
+                    | [1]: MUP PE 2   |               | [1]: MUP PE 2   |                   | [1]: MUP PE 2   |
+                    | [2]: MUP PE 1   |               | [2]: MUP PE 1   |                   | [2]: MUP PE 1   |
+                    |      SL: 3      |               |      SL: 2      |                   |      SL: 1      |
+                    +-----------------+               +-----------------+                   +-----------------+
+                    |       NSH       |               |       NSH       |                   |       NSH       |
+                    | spi: X, si: 255 |               | spi: X, si: 254 |                   | spi: X, si: 253 |
+                    +-----------------+               +-----------------+                   +-----------------+
+                    |   Inner Packet  |               |   Inner Packet  |                   |   Inner Packet  |
+                    +-----------------+               +-----------------+                   +-----------------+
 </pre>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-mup-sequence-session-transfo" class="selfRef">MUP Sequence Session Transform Example</a>
         </figcaption></figure>
 </div>
-<p id="section-4-2">
-      This section specifies the MUP Sequence Session Transform mechanism,
-      which enables ordered traversal across multiple service sites for a
-      sequential service pipeline by encoding the pipeline as SRv6 segment
-      list and maintaining per-stage service context using NSH fields.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3"> The execution order of a service pipeline is encoded directly into packet forwarding state. Specifically, the SRv6 segment list carried in the SRH defines the traversal sequence across MUP-PE nodes, while service processing context is maintained within the packet using SRv6 Service Function Chaining (SFC) mechanisms, as specified in <span>[<a href="#RFC9491" class="cite xref">RFC9491</a>]</span>. As illustrated in Figure 2, packets advance along the pipeline as each MUP-PE processes its local segment and updates the associated service context.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-4.1"> The MUP Sequence Session Transform is installed by the CATS-MUP-C at the ingress MUP-PE located at the RAN side. For UE traffic matching the corresponding session policy, the ingress MUP-PE decapsulates the GTP header and re-encapsulates the packet using SRv6 Service Function Chaining (SFC).<a href="#section-4-4.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-4-4.2">
+          <p id="section-4-4.2.1"> When traffic is steered according to the SRv6 segment list, each MUP-PE performs the following processing steps:<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-4.2.2.1"> The MUP-PE processes its local SRv6 SID and removes the outer SRv6 encapsulation, leaving the NSH and inner packet intact.<a href="#section-4-4.2.2.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4-4.2.2.2"> The packet is delivered toward the corresponding subtask instance. Depending on deployment, the MUP-PE MAY apply a site-specific encapsulation before forwarding the packet to the service instance.<a href="#section-4-4.2.2.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4-4.2.2.3"> If the subtask instance does not support NSH processing, an SFC proxy MAY be used to terminate or translate the NSH on behalf of the service function.<a href="#section-4-4.2.2.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4-4.2.2.4"> After processing, the packet is returned to the MUP-PE together with updated service context.<a href="#section-4-4.2.2.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4-4.2.2.5"> The MUP-PE re-applies the SRv6 encapsulation, updates SRH processing state, and forwards the packet toward the next segment indicated in the remaining SRv6 segment list without additional control-plane interaction.<a href="#section-4-4.2.2.5" class="pilcrow">¶</a>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-4.3"> The Network Service Header (NSH) carried with the packet provides a mechanism for preserving service pipeline context across processing stages by transporting auxiliary metadata alongside user packets.<a href="#section-4-4.3" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-4-4.4"> The NSH context header may include service pipeline identifiers, UE-related attributes, or intermediate processing state, enabling distributed service functions to coordinate execution and maintain continuity across the pipeline.<a href="#section-4-4.4" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-4-5"> By embedding pipeline progression into dataplane processing, the MUP Sequence Session Transform enables ordered service execution across multiple edge locations.<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="Security">
@@ -1476,8 +1497,12 @@ li > p:last-of-type:only-child {
 <span class="refAuthor">Tran, N., el at.</span>, <span class="refTitle">"Computing Aware Traffic Steering Consideration for Mobile User Plane Architecture"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-dcn-dmm-cats-mup/">https://datatracker.ietf.org/doc/draft-dcn-dmm-cats-mup/</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.draft-dcn-cats-req-service-segmentation">[I-D.draft-dcn-cats-req-service-segmentation]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Tran, N., el at.</span>, <span class="refTitle">"Additional CATS requirements consideration for Service Segmentation-related use cases"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/draft-dcn-cats-req-service-segmentation/">https://datatracker.ietf.org/doc/draft-dcn-cats-req-service-segmentation/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9491">[RFC9491]</dt>
+      <dd>
+<span class="refAuthor">Guichard, J.</span> and <span class="refAuthor">J. Tantsura</span>, <span class="refTitle">"Integration of the Network Service Header (NSH) and Segment Routing for Service Function Chaining (SFC)"</span>, <time datetime="2023-11" class="refDate">November 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/rfc9491/">https://datatracker.ietf.org/doc/rfc9491/</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
