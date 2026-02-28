@@ -1323,7 +1323,7 @@ li > p:last-of-type:only-child {
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-mup-sequence-session-transf" class="internal xref">MUP Sequence Session Transform</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-enabling-service-continuity" class="internal xref">Enabling Service Continuity for Stateful Service Segmentation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-references" class="internal xref">References</a></p>
@@ -1422,11 +1422,11 @@ li > p:last-of-type:only-child {
                                     | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
                                     +-----------+                         +-----------+                         +-----------+
                                           ^ |                                   ^ |                                   ^ |
-                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                          | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
-                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                          | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
-                          +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
+                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                           | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
+                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                           | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
+                           +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
       +--+  +------+                   +--------+                            +--------+                            +--------+
       |UE|-&gt;|RAN PE|------------------&gt;|MUP PE 1|---------------------------&gt;|MUP PE 2|---------------------------&gt;|MUP PE 3|
       +--+  +------+                   +--------+                            +--------+                            +--------+
@@ -1467,20 +1467,19 @@ li > p:last-of-type:only-child {
 </li>
           </ul>
 </li>
-        <li class="normal" id="section-4-4.3"> The Network Service Header (NSH) carried with the packet provides a mechanism for preserving service pipeline context across processing stages by transporting auxiliary metadata alongside user packets.<a href="#section-4-4.3" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-4-4.4"> The NSH context header may include service pipeline identifiers, UE-related attributes, or intermediate processing state, enabling distributed service functions to coordinate execution and maintain continuity across the pipeline.<a href="#section-4-4.4" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-4.3"> The NSH context header may include service pipeline identifiers, UE-related attributes, or intermediate processing state, enabling distributed service functions to coordinate execution and maintain continuity across the pipeline.<a href="#section-4-4.3" class="pilcrow">¶</a>
 </li>
       </ul>
 <p id="section-4-5"> By embedding pipeline progression into dataplane processing, the MUP Sequence Session Transform enables ordered service execution across multiple edge locations.<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="Security">
+<div id="service-continuity-stateful">
 <section id="section-5">
-      <h2 id="name-security-considerations">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      <h2 id="name-enabling-service-continuity">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-enabling-service-continuity" class="section-name selfRef">Enabling Service Continuity for Stateful Service Segmentation</a>
       </h2>
-<p id="section-5-1">This document should not affect the security of the Internet. [CHECK]<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1"> In practical deployments, service segmentation often involves stateful service instances, where execution state must be preserved across service instance relocation or pipeline reconfiguration. In such scenarios, immediate redirection of traffic to a newly selected service pipeline may result in service disruption if the target instances are not yet ready to process incoming requests or if state migration is still in progress.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2"> For example, consider a sequential service pipeline in which the final subtask maintains application state. When this stateful subtask is migrated due to mobility events or computing resource degradation, packets processed by upstream subtasks may reach the stateful subtask before migration is completed. As a result, these packets may be dropped or fail to be processed correctly, leading to wasted computing resources and unnecessary consumption of network bandwidth.<a href="#section-5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <section id="section-6">

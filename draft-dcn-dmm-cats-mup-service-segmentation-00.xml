@@ -185,11 +185,11 @@
                                     | SFC Proxy |                         | SFC Proxy |                         | SFC Proxy |
                                     +-----------+                         +-----------+                         +-----------+
                                           ^ |                                   ^ |                                   ^ |
-                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                          | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
-                          +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
-                          | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
-                          +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
+                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                           | NSH(X,255) | | | | Inner Pkt  |     | NSH(X,254) | | | | Inner Pkt  |     | NSH(X,253) | | | | Inner Pkt  |
+                           +------------+ | | +------------+     +------------+ | | +------------+     +------------+ | | +------------+
+                           | Inner Pkt  | | | | NSH(X,254) |     | Inner Pkt  | | | | NSH(X,253) |     | Inner Pkt  | | | | NSH(X,252) |
+                           +------------+ | v +------------+     +------------+ | v +------------+     +------------+ | v +------------+
       +--+  +------+                   +--------+                            +--------+                            +--------+
       |UE|->|RAN PE|------------------>|MUP PE 1|--------------------------->|MUP PE 2|--------------------------->|MUP PE 3|
       +--+  +------+                   +--------+                            +--------+                            +--------+
@@ -222,22 +222,22 @@
               <li> The MUP-PE re-applies the SRv6 encapsulation, updates SRH processing state, and forwards the packet toward the next segment indicated in the remaining SRv6 segment list without additional control-plane interaction. </li>
             </ul>
           </li>
-        <li> The Network Service Header (NSH) carried with the packet provides a mechanism for preserving service pipeline context across processing stages by transporting auxiliary metadata alongside user packets. </li>
-
         <li> The NSH context header may include service pipeline identifiers, UE-related attributes, or intermediate processing state, enabling distributed service functions to coordinate execution and maintain continuity across the pipeline. </li>
       </ul>
 
       <t> By embedding pipeline progression into dataplane processing, the MUP Sequence Session Transform enables ordered service execution across multiple edge locations. </t>
 
+    </section>
+
+    <section anchor="service-continuity-stateful">
+      <name>Enabling Service Continuity for Stateful Service Segmentation</name>
+
+      <t> In practical deployments, service segmentation often involves stateful service instances, where execution state must be preserved across service instance relocation or pipeline reconfiguration. In such scenarios, immediate redirection of traffic to a newly selected service pipeline may result in service disruption if the target instances are not yet ready to process incoming requests or if state migration is still in progress. </t>
+
+      <t> For example, consider a sequential service pipeline in which the final subtask maintains application state. When this stateful subtask is migrated due to mobility events or computing resource degradation, packets processed by upstream subtasks may reach the stateful subtask before migration is completed. As a result, these packets may be dropped or fail to be processed correctly, leading to wasted computing resources and unnecessary consumption of network bandwidth. </t>
+
     </section>   
     
-    <section anchor="Security">
-      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
-      <name>Security Considerations</name>
-      <t>This document should not affect the security of the Internet. [CHECK]</t>
-    </section>
-    
-    <!-- NOTE: The Acknowledgements and Contributors sections are at the end of this template -->
   </middle>
 
   <back>
