@@ -111,7 +111,7 @@
       <t> The existing CATS-MUP architecture focuses on mapping a session to a selected service instance. This document discusses scenarios where a service execution consists of multiple distributed subtasks forming a pipeline. It discusses extensions to session transformation behavior to enable ordered traversal across multiple subtask instances and to support service continuity during pipeline updates, particularly when stateful subtasks are involved. </t>
     </section>
 
-    <section title="Terminology used in this draft">
+    <section title="Terminology">
 
     <t>
     This document uses the terminology defined in 
@@ -119,10 +119,12 @@
     <xref target="I-D.draft-dcn-cats-req-service-segmentation"/>.
     </t>
 
+    <t> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174].</t>
+
     </section>
     
     <section>
-      <name>Proposed Architecture</name>
+      <name>Architecture Overview</name>
       <t> This document does not define mechanisms for constructing or orchestrating service pipelines. Pipeline composition, subtask placement, and lifecycle management are considered out of scope. Furthermore, it does not modify or redefine existing SRv6 behavior definitions and relies on procedures specified in existing SRv6 and SFC specifications. </t>
 
       <figure>
@@ -253,13 +255,17 @@
         </ul>
     </section>   
 
-    <section anchor="security-considerations">
+
+    <section anchor="IANA">
+    <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
+      <name>IANA Considerations</name>
+      <t>This memo includes no request to IANA.</t>
+    </section>
+    
+    <section anchor="Security">
+      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
       <name>Security Considerations</name>
-
-      <t> The CATS-MUP architecture relies on real-time computing and network status, as well as service-related information collected from multiple subtask instances, to select an optimal service pipeline and install corresponding session transform routes. Therefore, deployments require appropriate security protections to prevent unauthorized access, manipulation of service information, or disruption of traffic steering operations. </t>
-
-      <t> This document focuses on service segmentation scenarios and the associated session transform routes. Hence, broader security and privacy considerations are out of scope for this document.</t>
-
+      <t>TBD</t>
     </section>
     
   </middle>
