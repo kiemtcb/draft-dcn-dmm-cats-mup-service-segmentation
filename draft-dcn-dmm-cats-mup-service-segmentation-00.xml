@@ -93,7 +93,7 @@
     <keyword>Internet-Draft</keyword>
 
     <abstract>
-      <t>Abstract [REPLACE]</t>
+      <t>Service segmentation introduces an emerging deployment paradigm in which a service is composed of multiple distributed subtasks forming a service pipeline. This document discusses architectural considerations for a MUP Sequence Session Transform to support ordered traversal across multiple subtask instances and to maintain service continuity during pipeline updates, particularly when stateful subtasks are involved.</t>
     </abstract>
  
   </front>
@@ -108,7 +108,7 @@
 
       <t>The existing T1ST and T2ST mechanisms are defined for mapping a session to a selected service instance, where traffic is steered toward a specific execution endpoint. While this model is suitable when a session is directed to one optimal service instance, service segmentation introduces scenarios in which a sequential service pipeline spans multiple service instances as part of a single service execution. In such cases, the session-to-route transformation must not only select appropriate service instances, but also support ordered traversal across them and preserve overall service continuity, particularly when the pipeline includes stateful subtasks.</t>
 
-      <t>This document is proposed to discuss possible extension considerations to the CATS-MUP architecture in order to support service segmentation scenarios. The objective is to extend the existing session transformation and routing mechanisms to accommodate sequential and parallel service pipelines, and to provide routing-level considerations for preserving service continuity when stateful subtasks are involved.</t>
+      <t> The existing CATS-MUP architecture focuses on mapping a session to a selected service instance. This document discusses scenarios where a service execution consists of multiple distributed subtasks forming a pipeline. It discusses extensions to session transformation behavior to enable ordered traversal across multiple subtask instances and to support service continuity during pipeline updates, particularly when stateful subtasks are involved. </t>
     </section>
 
     <section title="Terminology used in this draft">
@@ -123,6 +123,8 @@
     
     <section>
       <name>Proposed Architecture</name>
+      <t> This document does not define mechanisms for constructing or orchestrating service pipelines. Pipeline composition, subtask placement, and lifecycle management are considered out of scope. Furthermore, it does not modify or redefine existing SRv6 behavior definitions and relies on procedures specified in existing SRv6 and SFC specifications. </t>
+
       <figure>
         <name>Service Segmentation Extensions for CATS-MUP Architecture</name>
         <artwork><![CDATA[
@@ -235,11 +237,20 @@
 
       <t> For example, consider a sequential service pipeline in which the final subtask maintains application state. When this stateful subtask is migrated due to mobility events or computing resource degradation, packets processed by upstream subtasks may reach the stateful subtask before migration is completed. As a result, these packets may be dropped or fail to be processed correctly, leading to wasted computing resources and unnecessary consumption of network bandwidth. </t>
 
-        <!-- Ngày mai viết thêm 2 behavior của SRv6-based Buffer (cite paper) => để mà traffic đến cần đến thì đã bị buffer => và được flush khi được yêu cầu => Buffer có thể là 1 VNF -->
-        <!-- Cái này chỉ được thực hiện với PDU modification  -->
-        <!-- Do chuỗi có có nhiều stateful subtask, việc migration lần lượt từng cái để đảm bảo service continuity là không phù hợp => cần parallel migration tất cả stateful subtasks  cùng một lúc-->
-        <!-- Chính vì vậy, tại mỗi MUP-PE của mỗi subtask, sau khi subtask xử lý do thay vì gắn lại SRH cũ thì được thay thế SRH mới với điểm đến là restored subtask và trước khi đến đó là buffer SID để mà traffic được giữ lại khi đang migration -->
-        <!-- Cơ chế chính là: sau khi tìm được pipeline mới, cài đặt routing để buffer => migration => đồng thời xả buffer và cập nhật lại bảng routing MUP PE để tránh đi qua buffer nữa  -->
+      <t> To preserve service continuity during pipeline transition, this document considers new use behaviors <xref target="Future-SRv6-service-continuity"/>, such as <em>End.M.GTP6.D.Buffer</em>, an extension of the End.M.GTP6.D function, integrated into all MUP Session Transform Routes. These behaviors enable traffic to be temporarily held while stateful service instances are being migrated. </t>
+
+        <ul>
+          <li> The MUP-C installs MUP Session Transform Routes with buffer (<xref target="ieee-access-service-continuity-stateful-service-segmentation"/>) at the relevant MUP-PEs, inserting a buffer SID as the first segment in the SRv6 segment list. As a result, packets matching the session policy are first steered toward the buffer. The buffer MAY be realized as a dedicated virtual network function (VNF). </li>
+
+          <li> Furthermore, the MUP-C updates the MUP-PE of all subtasks (current pipeline) so that packets returning from upstream subtask are re-encapsulated using <em>SR Policy headend behaviors</em> with a new SRH. The new segment list places the buffer SID as the first segment, followed by the MUP-PE of the next subtask in the newly selected service pipeline. </li>
+
+          <li> Once a new optimal service pipeline is determined, incoming traffic is redirected toward buffer, allowing migration of multiple stateful subtasks to be performed <strong>in parallel</strong> while maintaining service continuity. Parallel migration reduces service disruption time and increases efficiency. </li>
+
+          <li> After migration is completed, the MUP-C triggers buffer release procedures. Buffered packets are flushed toward the new pipeline, and the buffer removes its SID from the SRH. </li>
+
+          <li> Following buffer release, MUP-PE are updated so that subsequent packets bypass the buffer and are steered directly along the new service pipeline. </li>
+
+        </ul>
     </section>   
     
   </middle>
@@ -279,6 +290,27 @@
             <date month="November" year="2023"/>
           </front>
         </reference>
+
+        <reference anchor="Future-SRv6-service-continuity" target="https://doi.org/10.3390/fi16040138"> 
+          <front> 
+            <title>SRv6-Based Edge Service Continuity in 5G Mobile Networks</title> 
+            <author initials="J., el at" surname="Lemmi">
+              <organization/>
+            </author> 
+            <date year="2023"/> 
+          </front> 
+        </reference>
+
+        <reference anchor="ieee-access-service-continuity-stateful-service-segmentation" target="https://doi.org/10.1109/ACCESS.2026.3661972"> 
+          <front> 
+            <title>Enabling Service Continuity for Stateful Service Segmentation in Mobile Edge Computing Toward 6G</title> 
+            <author initials="K., el at" surname="Nguyen Trung">
+              <organization/>
+            </author> 
+            <date year="2026"/> 
+          </front> 
+        </reference>
+        
       </references>
     </references>
     
