@@ -217,7 +217,7 @@
             <t> When traffic is steered according to the SRv6 segment list, each MUP-PE performs the following processing steps: </t>
             <ul>
               <li> The MUP-PE processes its local SRv6 SID and removes the outer SRv6 encapsulation, leaving the NSH and inner packet intact. </li>
-              <li> The packet is delivered toward the corresponding subtask instance. Depending on deployment, the MUP-PE MAY apply a site-specific encapsulation before forwarding the packet to the service instance. </li>
+              <li> The packet is delivered toward the corresponding subtask instance. Depending on deployment, the MUP-PE MAY apply a site-specific encapsulation (such as VXLAN-gre, GRE <xref target="ieee-sfc-over-srv6"/>) before forwarding the packet to the service instance. </li>
               <li> If the subtask instance does not support NSH processing, an SFC proxy MAY be used to terminate or translate the NSH on behalf of the service function. </li>
               <li> After processing, the packet is returned to the MUP-PE together with updated service context. </li>
               <li> The MUP-PE re-applies the SRv6 encapsulation, updates SRH processing state, and forwards the packet toward the next segment indicated in the remaining SRv6 segment list without additional control-plane interaction. </li>
@@ -237,7 +237,7 @@
 
       <t> For example, consider a sequential service pipeline composed of five subtasks executed in order. The first four subtasks are stateless, while the fifth subtask is a stateful application. When the stateful subtask is migrated due to mobility events or computing resource degradation, packets processed by the upstream stateless subtasks (i.e., Subtasks 1 through 4) may reach at the stateful subtask before migration is completed. As a result, these packets may be dropped or fail to be processed correctly, leading to wasted computing resources and unnecessary consumption of network bandwidth. </t>
 
-      <t> To preserve service continuity during pipeline transition, this document considers new use behaviors <xref target="Future-SRv6-service-continuity"/>, such as <em>End.M.GTP6.D.Buffer</em>, an extension of the End.M.GTP6.D function, integrated into all MUP Session Transform Routes. These behaviors enable traffic to be temporarily held while stateful service instances are being migrated. </t>
+      <t> To preserve service continuity during pipeline transition, this document considers new use behaviors <xref target="future-SRv6-service-continuity"/>, such as <em>End.M.GTP6.D.Buffer</em>, an extension of the End.M.GTP6.D function, integrated into all MUP Session Transform Routes. These behaviors enable traffic to be temporarily held while stateful service instances are being migrated. </t>
 
         <ul>
           <li> The MUP-C installs MUP Session Transform Routes with buffer (<xref target="ieee-access-service-continuity-stateful-service-segmentation"/>) at the relevant MUP-PEs, inserting a buffer SID as the first segment in the SRv6 segment list. As a result, packets matching the session policy are first steered toward the buffer. The buffer MAY be realized as a dedicated virtual network function (VNF). </li>
@@ -252,66 +252,100 @@
 
         </ul>
     </section>   
+
+    <section anchor="security-considerations">
+      <name>Security Considerations</name>
+
+      <t> The CATS-MUP architecture relies on real-time computing and network status, as well as service-related information collected from multiple subtask instances, to select an optimal service pipeline and install corresponding session transform routes. Therefore, deployments require appropriate security protections to prevent unauthorized access, manipulation of service information, or disruption of traffic steering operations. </t>
+
+      <t> This document focuses on service segmentation scenarios and the associated session transform routes. Hence, broader security and privacy considerations are out of scope for this document.</t>
+
+    </section>
     
   </middle>
 
   <back>
     <references>
       <name>References</name>
- 
+
+      <!-- ================= Normative ================= -->
+
       <references>
-        <name>Informative References</name>
-       
-        <reference anchor="I-D.draft-dcn-dmm-cats-mup" target ="https://datatracker.ietf.org/doc/draft-dcn-dmm-cats-mup/">
+        <name>Normative References</name>
+
+        <reference anchor="I-D.draft-dcn-dmm-cats-mup"
+          target="https://datatracker.ietf.org/doc/draft-dcn-dmm-cats-mup/">
           <front>
             <title>Computing Aware Traffic Steering Consideration for Mobile User Plane Architecture</title>
-            <author initials="N., el at" surname="Tran">
-              <organization/>
-            </author>
+            <author initials="N." surname="Tran"/>
             <date year="2026"/>
           </front>
         </reference>
 
-        <reference anchor="I-D.draft-dcn-cats-req-service-segmentation" target="https://datatracker.ietf.org/doc/draft-dcn-cats-req-service-segmentation/">
-        <!-- [REPLACE/DELETE] Example reference written by an organization not a person -->
+        <reference anchor="I-D.draft-dcn-cats-req-service-segmentation"
+          target="https://datatracker.ietf.org/doc/draft-dcn-cats-req-service-segmentation/">
           <front>
-            <title>Additional CATS requirements consideration for Service Segmentation-related use cases</title>
-            <author initials="N., el at" surname="Tran">
-              <organization/>
-            </author>
+            <title>Additional CATS Requirements Consideration for Service Segmentation-related Use Cases</title>
+            <author initials="N." surname="Tran"/>
             <date year="2026"/>
           </front>
-        </reference>       
-                <reference anchor="RFC9491" target="https://datatracker.ietf.org/doc/rfc9491/">
+        </reference>
+
+        <reference anchor="RFC9491"
+          target="https://datatracker.ietf.org/doc/rfc9491/">
           <front>
             <title>Integration of the Network Service Header (NSH) and Segment Routing for Service Function Chaining (SFC)</title>
-            <author initials="J." surname="Guichard"></author>
-            <author initials="J." surname="Tantsura"></author>
+            <author initials="J." surname="Guichard"/>
+            <author initials="J." surname="Tantsura"/>
             <date month="November" year="2023"/>
           </front>
         </reference>
 
-        <reference anchor="Future-SRv6-service-continuity" target="https://doi.org/10.3390/fi16040138"> 
-          <front> 
-            <title>SRv6-Based Edge Service Continuity in 5G Mobile Networks</title> 
-            <author initials="J., el at" surname="Lemmi">
-              <organization/>
-            </author> 
-            <date year="2023"/> 
-          </front> 
+        <reference anchor="future-SRv6-service-continuity"
+          target="https://doi.org/10.3390/fi16040138">
+          <front>
+            <title>SRv6-Based Edge Service Continuity in 5G Mobile Networks</title>
+            <author initials="J." surname="Lemmi"/>
+            <date year="2023"/>
+          </front>
         </reference>
 
-        <reference anchor="ieee-access-service-continuity-stateful-service-segmentation" target="https://doi.org/10.1109/ACCESS.2026.3661972"> 
-          <front> 
-            <title>Enabling Service Continuity for Stateful Service Segmentation in Mobile Edge Computing Toward 6G</title> 
-            <author initials="K., el at" surname="Nguyen Trung">
-              <organization/>
-            </author> 
-            <date year="2026"/> 
-          </front> 
-        </reference>
-        
       </references>
+
+      <!-- ================= Informative ================= -->
+
+      <references>
+        <name>Informative References</name>
+
+        <reference anchor="ieee-access-service-segmentation"
+          target="https://doi.org/10.1109/ACCESS.2025.3630182">
+          <front>
+            <title>Design of 5G Architecture Enhancements for Supporting Edge Split Computing Service Pipeline</title>
+            <author initials="M-N." surname="Tran"/>
+            <date year="2025"/>
+          </front>
+        </reference>
+
+        <reference anchor="ieee-access-service-continuity-stateful-service-segmentation"
+          target="https://doi.org/10.1109/ACCESS.2026.3661972">
+          <front>
+            <title>Enabling Service Continuity for Stateful Service Segmentation in Mobile Edge Computing Toward 6G</title>
+            <author initials="K." surname="Nguyen Trung"/>
+            <date year="2026"/>
+          </front>
+        </reference>
+
+        <reference anchor="ieee-sfc-over-srv6"
+          target="https://doi.org/10.1109/ICTC62082.2024.10827193">
+          <front>
+            <title>A Design and Implementation of Service Function Chaining Over Segment Routing IPv6 Network</title>
+            <author initials="K." surname="Nguyen Trung"/>
+            <date year="2024"/>
+          </front>
+        </reference>
+
+      </references>
+
     </references>
     
  </back>
