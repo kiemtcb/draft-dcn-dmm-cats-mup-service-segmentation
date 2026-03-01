@@ -173,7 +173,7 @@
     </section>
 
     <section anchor="mup-sequence-session-transform">
-      <name>MUP Sequence Session Transform</name>
+      <name>MUP Sequence Session Transform Mechanism</name>
 
       <t> The MUP Sequence Session Transform defines how the Mobile User Plane steers packets across an ordered set of service stages using a single session transformation operation. Under this mechanism, the execution sequence of a service pipeline is encoded directly into packet forwarding behavior at MUP-PE nodes. </t>
 
@@ -233,7 +233,7 @@
     </section>
 
     <section anchor="service-continuity-stateful">
-      <name>Enabling Service Continuity for Stateful Service Segmentation</name>
+      <name>Service Continuity for Stateful Service Segmentation</name>
 
       <t> In practical deployments, service segmentation often involves stateful service instances, where execution state must be preserved across service instance relocation or pipeline reconfiguration. In such scenarios, immediate redirection of traffic to a newly selected service pipeline may result in service disruption if the target instances are not yet ready to process incoming requests or if state migration is still in progress. </t>
 
@@ -255,17 +255,16 @@
         </ul>
     </section>   
 
+    <section anchor="Security">
+      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
+      <name>Security Considerations</name>
+      <t>TBD</t>
+    </section>
 
     <section anchor="IANA">
     <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
       <name>IANA Considerations</name>
       <t>This memo includes no request to IANA.</t>
-    </section>
-    
-    <section anchor="Security">
-      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
-      <name>Security Considerations</name>
-      <t>TBD</t>
     </section>
     
   </middle>
