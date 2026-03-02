@@ -242,7 +242,7 @@
       <t> To preserve service continuity during pipeline transition, this document considers new use behaviors <xref target="future-SRv6-service-continuity"/>, such as <em>End.M.GTP6.D.Buffer</em>, an extension of the End.M.GTP6.D function, integrated into all MUP Session Transform Routes. These behaviors enable traffic to be temporarily held while stateful service instances are being migrated. </t>
 
         <ul>
-          <li> The MUP-C installs MUP Session Transform Routes with buffer (<xref target="ieee-access-service-continuity-stateful-service-segmentation"/>) at the relevant MUP-PEs, inserting a buffer SID as the first segment in the SRv6 segment list. As a result, packets matching the session policy are first steered toward the buffer. The buffer MAY be realized as a dedicated virtual network function (VNF). </li>
+          <li> The MUP-C installs MUP Session Transform Routes with buffer <xref target="ieee-access-service-continuity-stateful-service-segmentation"/> at the relevant MUP-PEs, inserting a buffer SID as the first segment in the SRv6 segment list. As a result, packets matching the session policy are first steered toward the buffer. The buffer MAY be realized as a dedicated virtual network function (VNF). </li>
 
           <li> Furthermore, the MUP-C updates the MUP-PE of all subtasks (current pipeline) so that packets returning from upstream subtask are re-encapsulated using <em>SR Policy headend behaviors</em> with a new SRH. The new segment list places the buffer SID as the first segment, followed by the MUP-PE of the next subtask in the newly selected service pipeline. </li>
 
@@ -255,16 +255,16 @@
         </ul>
     </section>   
 
-    <section anchor="Security">
-      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
-      <name>Security Considerations</name>
-      <t>TBD</t>
-    </section>
-
     <section anchor="IANA">
     <!-- All drafts are required to have an IANA considerations section. See RFC 8126 for a guide.-->
       <name>IANA Considerations</name>
       <t>This memo includes no request to IANA.</t>
+    </section>
+
+    <section anchor="Security">
+      <!-- All drafts are required to have a security considerations section. See RFC 3552 for a guide. -->
+      <name>Security Considerations</name>
+      <t>TBD</t>
     </section>
     
   </middle>
@@ -306,15 +306,6 @@
           </front>
         </reference>
 
-        <reference anchor="future-SRv6-service-continuity"
-          target="https://doi.org/10.3390/fi16040138">
-          <front>
-            <title>SRv6-Based Edge Service Continuity in 5G Mobile Networks</title>
-            <author initials="J." surname="Lemmi"/>
-            <date year="2023"/>
-          </front>
-        </reference>
-
       </references>
 
       <!-- ================= Informative ================= -->
@@ -346,6 +337,15 @@
             <title>A Design and Implementation of Service Function Chaining Over Segment Routing IPv6 Network</title>
             <author initials="K." surname="Nguyen Trung"/>
             <date year="2024"/>
+          </front>
+        </reference>
+
+        <reference anchor="future-SRv6-service-continuity"
+          target="https://doi.org/10.3390/fi16040138">
+          <front>
+            <title>SRv6-Based Edge Service Continuity in 5G Mobile Networks</title>
+            <author initials="J." surname="Lemmi"/>
+            <date year="2023"/>
           </front>
         </reference>
 
